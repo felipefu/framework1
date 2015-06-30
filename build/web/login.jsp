@@ -7,9 +7,19 @@
     </head>
     <body>
         <form method="GET" action="LoginServlet">
-            Login: <input type="text" name="login"/><br>		
-            Senha: <input type="text" name="senha"/>
-            <input type="submit" value="submit">			
+            <table>
+                <tr>
+                    <td>Usuário</td>
+                    <td><input type="text" name="login" /></td>
+                </tr>
+                <tr>
+                    <td>Senha</td>
+                    <td><input type="password" name="senha" /></td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="Login" /></td>
+                </tr>
+            </table>
         </form>
     </body>
 </html>

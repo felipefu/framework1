@@ -143,4 +143,95 @@ public class UsuarioDAO {
 
         return connection;
     }
+
+    public void alterar(Usuario usuario) {
+        try {
+            Connection conexao = getConnection();
+
+            PreparedStatement pstmt = conexao
+                    .prepareStatement("update usuario set nome = ?, cpf = ?, email = ?, senha = ?"
+                            + " WHERE login = ? ");
+            pstmt.setString(1, usuario.getNome());
+            pstmt.setString(2, usuario.getCpf());
+            pstmt.setString(3, usuario.getEmail());
+            pstmt.setString(4, usuario.getSenha());
+            pstmt.execute();
+            pstmt.close();
+            conexao.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void excluir(Usuario usuario) {
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement pstm = conexao.prepareStatement("delete from usuario where login = ? ");
+            pstm.setString(1, usuario.getLogin());
+            pstm.execute();
+            pstm.close();
+            conexao.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean existe(Usuario usuario) {
+        boolean achou = false;
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement pstm = conexao.prepareStatement("select * from usuario where login = ?");
+            pstm.setString(1, usuario.getLogin());
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                achou = true;
+            }
+            pstm.close();
+            conexao.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return achou;
+    }
+
+    public void inserir(Usuario usuario) {
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement pstm = conexao.prepareStatement("Insert into usuario (login, senha, nome, cpf, email) values (?,?,?,?,?)");
+            pstm.setString(1, usuario.getLogin());
+            pstm.setString(2, usuario.getSenha());
+            pstm.setString(3, usuario.getNome());
+            pstm.setString(4, usuario.getCpf());
+            pstm.setString(5, usuario.getEmail());
+            pstm.execute();
+            pstm.close();
+            conexao.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Usuario consultar(Usuario usuario) {
+        try {
+            Connection conexao = getConnection();
+            PreparedStatement pstm = conexao
+                    .prepareStatement("Select * from usuario where matricula =	?");
+            pstm.setString(1, usuario.getLogin());
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                usuario.setLogin(rs.getString("login"));
+                usuario.setSenha(rs.getString("senha"));
+                usuario.setNome(rs.getString("nome"));
+                usuario.setCpf(rs.getString("cpf"));
+                usuario.setEmail(rs.getString("email"));
+            }
+            pstm.close();
+            conexao.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return usuario;
+    }
+
 }

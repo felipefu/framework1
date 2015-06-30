@@ -58,12 +58,14 @@ public class LoginServlet extends HttpServlet {
             usuario.setSenha(request.getParameter("senha"));
 
             usuario = UsuarioDAO.login2(usuario);
+            
+            HttpSession session = request.getSession(true);
 
             if (usuario.isUsuarioValido()) {
-                HttpSession session = request.getSession(true);
                 session.setAttribute("currentSessionUser", usuario);
                 response.sendRedirect("logado.jsp");
             } else {
+                session.invalidate();
                 response.sendRedirect("erroLogin.jsp");
             }
         } catch (Throwable theException) {
