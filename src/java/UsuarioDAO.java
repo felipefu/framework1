@@ -1,84 +1,146 @@
 
 import beans.usuarioBean;
 import java.sql.*;
+import javax.resource.spi.ConnectionManager;
 
 public class UsuarioDAO {
 
     static Connection currentCon = null;
     static ResultSet rs = null;
 
-    public static usuarioBean login(usuarioBean bean) {
+    public static usuarioBean login2(usuarioBean bean) {
 
-        //preparing some objects for connection 
         Statement stmt = null;
+        String login = bean.getLogin();
+        String senha = bean.getSenha();
 
-        String username = bean.getLogin();
-        String password = bean.getSenha();
+        String searchQuery = "select login,"
+                + "       senha,"
+                + "       nome"
+                + "  from usuario "
+                + " where login='" + login + "'"
+                + "   and senha='" + senha + "';";
 
-        String searchQuery
-                = "select * from users where username='"
-                + username
-                + "' AND password='"
-                + password
-                + "'";
-
-        // "System.out.println" prints in the console; Normally used to trace the process
-        System.out.println("Your user name is " + username);
-        System.out.println("Your password is " + password);
+        System.out.println("Login: " + login);
+        System.out.println("Senha: " + senha);
         System.out.println("Query: " + searchQuery);
 
+        /*try {
+         currentCon = ConnectionManager.getConnection();
+         stmt = currentCon.createStatement();
+         rs = stmt.executeQuery(searchQuery);
+         boolean result = rs.next();
+
+         if (!result) {
+         //login e senha informados invalidos
+         bean.setUsuarioValido(false);
+         }
+         else if (result) {
+         //                bean.setNome(rs.getString("nome"));
+         //                bean.setLogin(rs.getString("login"));
+         //                bean.setSenha(rs.getString("senha"));
+         //                bean.setCpf(rs.getString("cpf"));
+         //                bean.setEmail(rs.getString("email"));
+         //                bean.setUsuarioValido(true);*/
+        bean.setNome("nome");
+        bean.setLogin("login");
+        bean.setSenha("senha");
+        bean.setCpf("cpf");
+        bean.setEmail("email");
+        bean.setUsuarioValido(true);
+
+        /*}
+         } catch (Exception ex) {
+         System.out.println("Erro no login: " + ex);
+         }
+         finally {
+         if (rs != null) {
+         try {
+         rs.close();
+         } catch (Exception e) {
+         }
+         rs = null;
+         }
+
+         if (stmt != null) {
+         try {
+         stmt.close();
+         } catch (Exception e) {
+         }
+         stmt = null;
+         }
+
+         if (currentCon != null) {
+         try {
+         currentCon.close();
+         } catch (Exception e) {
+         }
+         currentCon = null;
+         }
+         }*/
+        return bean;
+    }
+
+    public static usuarioBean login(usuarioBean bean) {
+        Connection c = UsuarioDAO.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            //connect to DB 
-            currentCon = ConnectionManager.getConnection();
-            stmt = currentCon.createStatement();
-            rs = stmt.executeQuery(searchQuery);
-            boolean more = rs.next();
+            ps = c.prepareStatement("select login, senha, nome from usuario where login = ? and senha = ?");
+            ps.setString(1, bean.getLogin());
+            ps.setString(2, bean.getSenha());
 
-            // if user does not exist set the isValid variable to false
-            if (!more) {
-                System.out.println("Sorry, you are not a registered user! Please sign up first");
-                bean.setValid(false);
-            } //if user exists set the isValid variable to true
-            else if (more) {
-                String firstName = rs.getString("FirstName");
-                String lastName = rs.getString("LastName");
+            rs = ps.executeQuery();
 
-                System.out.println("Welcome " + firstName);
-                bean.setFirstName(firstName);
-                bean.setLastName(lastName);
-                bean.setValid(true);
+            if (rs.next()) {
+
+                bean.setNome(rs.getString("nome"));
+                bean.setLogin(rs.getString("login"));
+                bean.setSenha(rs.getString("senha"));
+                bean.setCpf(rs.getString("cpf"));
+                bean.setEmail(rs.getString("email"));
+                bean.setUsuarioValido(true);
             }
-        } catch (Exception ex) {
-            System.out.println("Log In failed: An Exception has occurred! " + ex);
-        } //some exception handling
-        finally {
+            return bean;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (Exception e) {
+                } catch (SQLException e) {;
                 }
                 rs = null;
             }
-
-            if (stmt != null) {
+            if (ps != null) {
                 try {
-                    stmt.close();
-                } catch (Exception e) {
+                    ps.close();
+                } catch (SQLException e) {;
                 }
-                stmt = null;
+                ps = null;
             }
-
-            if (currentCon != null) {
+            if (c != null) {
                 try {
-                    currentCon.close();
-                } catch (Exception e) {
+                    c.close();
+                } catch (SQLException e) {;
                 }
-
-                currentCon = null;
+                c = null;
             }
         }
+        return null;
+    }
 
-        return bean;
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/nome_banco", "usuario_banco", "senha_banco");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        return connection;
     }
 }

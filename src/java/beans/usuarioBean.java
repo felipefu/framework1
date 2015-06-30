@@ -5,7 +5,16 @@ public class usuarioBean {
     private String login;
     private String senha;
     private String nome;
-    private String sobrenome;
+    private String cpf;
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
     public boolean usuarioValido;
 
     public String getLogin() {
@@ -32,12 +41,12 @@ public class usuarioBean {
         this.nome = nome;
     }
 
-    public String getSobrenome() {
-        return sobrenome;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setSobrenome(String sobrenome) {
-        this.sobrenome = sobrenome;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public boolean isUsuarioValido() {
